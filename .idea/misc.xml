@@ -4,6 +4,8 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/zonium-auth" />
     <file type="web" url="file://$PROJECT_DIR$/zonium-backend" />
+    <file type="web" url="file://$PROJECT_DIR$/zonium-discovery" />
+    <file type="web" url="file://$PROJECT_DIR$/zonium-gateway" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />

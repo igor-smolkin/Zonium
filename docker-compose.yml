@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+
+  auth-service:
+    build:
+      context: ./zonium-auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - auth-db
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/zonium_auth_db
+      - SPRING_DATASOURCE_USERNAME=auth_user
+      - SPRING_DATASOURCE_PASSWORD=Zedd123321!
+
+  auth-db:
+    image: postgres:15
+    container_name: postgres-auth-db
+    environment:
+      POSTGRES_DB: zonium_auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: Zedd123321!
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend-service:
+    build:
+      context: ./zonium-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - api-db
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://api-db:5432/zonium_api_db
+      - SPRING_DATASOURCE_USERNAME=api_user
+      - SPRING_DATASOURCE_PASSWORD=Zedd123321!
+
+  api-db:
+    image: postgres:15
+    container_name: postgres-api-db
+    environment:
+      POSTGRES_DB: zonium_api_db
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: Zedd123321!
+    volumes:
+      - api_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  gateway:
+    build:
+      context: ./zonium-gateway
+    ports:
+      - "8085:8085"
+    depends_on:
+      - auth-service
+      - backend-service
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  eureka-server:
+    build:
+      context: ./zonium-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+
+  node-service:
+    build:
+      context: ./zonium-node
+    ports:
+      - "3001:3001"
+
+  frontend:
+    build:
+      context: ./zonium-frontend
+    ports:
+      - "5173:80"
+
+volumes:
+  auth_pgdata:
+  api_pgdata:

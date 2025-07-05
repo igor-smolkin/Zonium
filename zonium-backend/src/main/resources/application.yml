@@ -1,8 +1,10 @@
 spring:
+  application:
+    name: backend-service
   datasource:
-    username: postgres
-    password: admin
-    url: jdbc:postgresql://localhost:5432/zonium
+    url: postgresql://api-db:5432/zonium_api_db
+    username: api_user
+    password: Zedd123321!
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -14,6 +16,11 @@ spring:
 
 logging:
   level:
-    root: WARN
+    root: INFO
     org.ataraxii.wishlist: INFO
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
 
