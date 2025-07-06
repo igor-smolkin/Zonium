@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +36,7 @@ public class Proxy {
 
     @Column(name = "created_at")
     private Instant createdAt;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 }

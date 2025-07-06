@@ -9,15 +9,19 @@ CREATE TABLE proxy
     port       int         NOT NULL,
     username   varchar(64),
     password   varchar(64),
-    created_at timestamp DEFAULT now()
+    created_at timestamp DEFAULT now(),
+    user_id    uuid        NOT NULL
 );
 
 CREATE TABLE browser_session
 (
-    id             BIGSERIAL PRIMARY KEY,
-    proxy_id       BIGINT      NOT NULL REFERENCES proxy (id),
-    fingerprint    TEXT,
-    user_agent     VARCHAR(512),
-    status         VARCHAR(20) NOT NULL,
-    created_at     TIMESTAMP DEFAULT now()
+    id          BIGSERIAL PRIMARY KEY,
+    proxy_id    BIGINT      NOT NULL REFERENCES proxy (id),
+    fingerprint TEXT,
+    user_agent  VARCHAR(512),
+    status      VARCHAR(20) NOT NULL,
+    created_at  TIMESTAMP DEFAULT now(),
+    user_id     uuid        NOT NULL
 );
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";

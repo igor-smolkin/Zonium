@@ -1,14 +1,6 @@
 spring:
   application:
     name: backend-service
-  datasource:
-    url: postgresql://api-db:5432/zonium_api_db
-    username: api_user
-    password: Zedd123321!
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 50
 
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
@@ -19,8 +11,13 @@ logging:
     root: INFO
     org.ataraxii.wishlist: INFO
 
+jwt:
+  secret: "5a2b27cf15d9f8debfc330980a86f3fb2f564c180dbae44282bd3c758bc1453a4060b9c93c34667e7a3f5d8dbc46def0be612b312c056a88daaec7fc7be5c391"
+
 eureka:
   client:
     service-url:
       defaultZone: http://eureka-server:8761/eureka
 
+server:
+  port: 8080

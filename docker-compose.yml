@@ -11,10 +11,7 @@ services:
       - eureka-server
       - auth-db
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/zonium_auth_db
-      - SPRING_DATASOURCE_USERNAME=auth_user
-      - SPRING_DATASOURCE_PASSWORD=Zedd123321!
+      - SPRING_PROFILES_ACTIVE=docker
 
   auth-db:
     image: postgres:15
@@ -37,10 +34,7 @@ services:
       - eureka-server
       - api-db
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://api-db:5432/zonium_api_db
-      - SPRING_DATASOURCE_USERNAME=api_user
-      - SPRING_DATASOURCE_PASSWORD=Zedd123321!
+      - SPRING_PROFILES_ACTIVE=docker
 
   api-db:
     image: postgres:15
@@ -64,7 +58,7 @@ services:
       - backend-service
       - eureka-server
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
 
   eureka-server:
     build:

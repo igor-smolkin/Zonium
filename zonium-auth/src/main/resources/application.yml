@@ -4,14 +4,6 @@ server:
 spring:
   application:
     name: auth-service
-  datasource:
-    url: jdbc:postgresql://auth-db:5432/zonium_auth_db
-    username: auth_user
-    password: Zedd123321!
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 50
 
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
