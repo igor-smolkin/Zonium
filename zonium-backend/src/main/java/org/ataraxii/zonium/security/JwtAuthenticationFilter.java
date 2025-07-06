@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,38 +32,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
+        final String jwt = resolveToken(request);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request,response);
-            return;
-        }
-
-        jwt = authHeader.substring(7);
-
-        if (!jwtService.isTokenValid(jwt)) {
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
+        try {
+            if (!jwtService.isTokenValid(jwt)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        String username = jwtService.extractUsername(jwt);
-        UUID userId = jwtService.extractUserId(jwt);
-        List<String> roles = jwtService.extractRoles(jwt);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtService.extractUsername(jwt);
+                UUID userId = jwtService.extractUserId(jwt);
+                List<String> roles = jwtService.extractRoles(jwt);
 
-        List<GrantedAuthority> authorities = roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                List<GrantedAuthority> authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 
-        JwtUser jwtUser = new JwtUser(userId, username, authorities);
+                JwtUser jwtUser = new JwtUser(userId, username, authorities);
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(jwtUser, null, authorities);
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(jwtUser, null, authorities);
 
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        } catch (Exception e) {
+            log.warn("Ошибка валидации токена: {}", e.getMessage());
+        }
         filterChain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        final String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

@@ -25,6 +25,7 @@ async function submit() {
   await fetch('http://localhost:8080/api/proxy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: "include",
     body: JSON.stringify(form),
   })
   emit('created')

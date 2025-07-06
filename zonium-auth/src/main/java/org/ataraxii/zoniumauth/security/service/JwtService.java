@@ -19,8 +19,17 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final long ACCESS_TOKEN_VALIDITY_MS = 60 * 60 * 1000;
-    private static final long REFRESH_TOKEN_VALIDITY_MS = 7 * 24 * 60 * 60 * 1000;
+    private static final long ACCESS_TOKEN_VALIDITY_MS = 60 * 60 * 1000; // 1 час
+    private static final long REFRESH_TOKEN_VALIDITY_MS = 7 * 24 * 60 * 60 * 1000; // 7 дней
+
+    // Геттеры для передачи времени жизни токенов в сервис создания куки
+    public int getAccessTokenValiditySeconds() {
+        return (int) (ACCESS_TOKEN_VALIDITY_MS / 1000);
+    }
+
+    public int getRefreshTokenValiditySeconds() {
+        return (int) (REFRESH_TOKEN_VALIDITY_MS / 1000);
+    }
 
     @Value("${jwt.secret}")
     private String secret;
@@ -89,10 +98,10 @@ public class JwtService {
     }
 
     public Date getRefreshTokenExpiryDate() {
-        return new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_MS); // 30 дней
+        return new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_MS); // 7 дней
     }
 
     public Date getAccessTokenExpiryDate() {
-        return new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MS); // 48 часов
+        return new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MS); // 1 час
     }
 }

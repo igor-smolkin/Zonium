@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.ataraxii.zoniumauth.exception.InvalidTokenException;
 import org.ataraxii.zoniumauth.security.service.CustomUserDetailsService;
 import org.ataraxii.zoniumauth.security.service.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,20 +32,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Запрос должен содержать заголовок Authorization: Bearer "token"
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
+        final String jwt = resolveToken(request);
+        String username = null;
 
-        // Проверка на наличие Bearer в заголовке
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        if (jwt != null) {
+            try {
+                username = jwtService.extractUsername(jwt);
+            } catch (Exception e) {
+                log.warn("Ошибка чтения токена");
+                throw new InvalidTokenException("Некорректный токен");
+            }
         }
-
-        // Отделение Bearer от токена
-        jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
 
         // SecurityContextHolder проверяет что в текущем контексте никто еще не аутентифицирован
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -62,5 +62,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    // Извлечение токена из заголовка или куки (временно опционально, в дальнейшем возможен пересмотр)
+    private String resolveToken(HttpServletRequest request) {
+        // Логика для обработки заголовков
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        // Логика для обработки куки
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }
