@@ -4,18 +4,14 @@ import {useRouter} from 'vue-router'
 
 const router = useRouter()
 
-// Состояние: показывать форму логина или регистрации
 const isLogin = ref(true)
 
-// Поля формы
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
-// Ошибка
 const errorMessage = ref('')
 
-// Отправка запроса на сервер
 async function register() {
   if (password.value !== confirmPassword.value) {
     errorMessage.value = 'Пароли не совпадают'
@@ -38,7 +34,6 @@ async function register() {
       return
     }
 
-    // После успешной регистрации редирект на логин
     isLogin.value = true
     email.value = ''
     password.value = ''
@@ -67,15 +62,12 @@ async function login() {
       return
     }
 
-    // В идеале тут нужно обработать токены, но ты говорил про редирект
-    // Редирект на главную страницу фронта
     router.push('/')
   } catch (e) {
     errorMessage.value = 'Ошибка сети'
   }
 }
 
-// Переключить форму
 function toggleForm() {
   errorMessage.value = ''
   email.value = ''
@@ -120,7 +112,13 @@ function toggleForm() {
 
 <style scoped>
 .auth-form {
-  max-width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  max-width: 300px;
+  width: 90vw;
   margin: auto;
   padding: 1rem;
   border: 1px solid #ccc;
@@ -155,5 +153,10 @@ function toggleForm() {
 
 .auth-form button:hover {
   background: #369c6f;
+}
+
+.auth-form h2,
+.auth-form p {
+  text-align: center;
 }
 </style>

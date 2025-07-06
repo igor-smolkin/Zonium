@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Ruberoid Bold';
+    src: url('./fonts/Ruberoid-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Ruberoid Bold', serif;
+}

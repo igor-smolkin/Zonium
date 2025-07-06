@@ -39,7 +39,7 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         var configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:5173"); // Vue frontend
+        configuration.addAllowedOrigin("http://localhost:5174"); // Vue frontend
         configuration.addAllowedOrigin("http://localhost:3001"); // Node js open tabs logic
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");

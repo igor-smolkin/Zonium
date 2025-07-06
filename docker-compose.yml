@@ -78,7 +78,7 @@ services:
     build:
       context: ./zonium-frontend
     ports:
-      - "5173:80"
+      - "5174:80"
 
 volumes:
   auth_pgdata:
